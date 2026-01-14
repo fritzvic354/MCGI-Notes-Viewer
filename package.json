@@ -1,0 +1,34 @@
+{
+  "name": "mcgi-notes-viewer",
+  "version": "1.0.0",
+  "description": "MCGI Notes & Viewer (desktop)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Fritz Gerald Victorino",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "org.mcgi.notes.viewer",
+    "productName": "MCGI Notes & Viewer",
+    "files": [
+      "**/*",
+      "!dist",
+      "!node_modules/.cache"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "MCGI_Notes_Icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

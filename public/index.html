@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Brethren Study Notes</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f97316">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Inter:wght@400;600&family=Lora:wght@400;600&family=Merriweather:wght@400;700&family=Nunito:wght@400;700&family=Open+Sans:wght@400;600&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&family=Roboto:wght@400;500&family=Space+Mono:wght@400;700&family=Ubuntu:wght@400;700&family=Montserrat:wght@400;600&family=Crimson+Text:wght@400;600&family=Lato:wght@400;700&family=EB+Garamond:wght@400;700&family=Quicksand:wght@400;600&family=PT+Serif:wght@400;700&family=Dancing+Script:wght@400;700&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    /* --- 1. CORE VARIABLES --- */
+    :root{
+      /* Structure */
+      --sidebar-w: 260px;
+      --header-h: 50px;
+      --shadow:0 4px 6px -1px rgba(0,0,0,0.1);
+      --base-size: 14px; 
+      --app-font: 'Inter', sans-serif;
+
+      /* Default (Light) Colors */
+      --bg: #f9fafb; 
+      --surface: #ffffff; 
+      --text: #111827; 
+      --muted: #6b7280; 
+      --border: #e5e7eb;
+      --brand: #f97316; 
+      --brand-light: #ffedd5;
+      --btn-text: #ffffff; 
+      --danger: #ef4444; 
+      --success: #16a34a;
+    }
+
+    @media (prefers-color-scheme: dark){
+      :root{ 
+        --bg: #0f172a; --surface: #1e293b; --text: #f3f4f6; --muted: #94a3b8; 
+        --border: #334155; --shadow: 0 4px 6px -1px rgba(0,0,0,0.5); --btn-text: #ffffff;
+        --brand-light: #3a2214;
+      }
+    }
+    
+    /* --- THEMES (FULL LIST RESTORED) --- */
+    /* Set 1 */
+    :root[data-theme="sunrise"]{ --bg:#fff7ed; --surface:#fffdf8; --text:#2a1a12; --muted:#7c2d12; --border:#fed7aa; --brand:#ea580c; --btn-text:#ffffff; }
+    :root[data-theme="ocean"]{ --bg:#ecfeff; --surface:#f0fdfa; --text:#164e63; --muted:#0e7490; --border:#a5f3fc; --brand:#0891b2; --btn-text:#ffffff; }
+    :root[data-theme="forest"]{ --bg:#f0fdf4; --surface:#dcfce7; --text:#14532d; --muted:#15803d; --border:#86efac; --brand:#16a34a; --btn-text:#ffffff; }
+    :root[data-theme="grape"]{ --bg:#fbf7ff; --surface:#f3e8ff; --text:#3b0764; --muted:#7e22ce; --border:#d8b4fe; --brand:#9333ea; --btn-text:#ffffff; }
+    :root[data-theme="sand"]{ --bg:#fefce8; --surface:#fef9c3; --text:#422006; --muted:#854d0e; --border:#fde047; --brand:#eab308; --btn-text:#3f2c05; }
+    :root[data-theme="slate"]{ --bg:#f8fafc; --surface:#ffffff; --text:#0f172a; --muted:#64748b; --border:#cbd5e1; --brand:#475569; --btn-text:#ffffff; }
+    :root[data-theme="sepia"]{ --bg:#fdf6e3; --surface:#eee8d5; --text:#433422; --muted:#8d6e63; --border:#d7ccc8; --brand:#a05a2c; --btn-text:#ffffff; }
+    :root[data-theme="night"]{ --bg:#020617; --surface:#0f172a; --text:#e2e8f0; --muted:#94a3b8; --border:#1e2937; --brand:#38bdf8; --btn-text:#0f172a; }
+    :root[data-theme="lavender"]{ --bg:#faf5ff; --surface:#f3e8ff; --text:#581c87; --muted:#7e22ce; --border:#e9d5ff; --brand:#9333ea; --btn-text:#ffffff; }
+    :root[data-theme="espresso"]{ --bg:#2b2220; --surface:#3d3230; --text:#eaddcf; --muted:#a68a80; --border:#5c4b45; --brand:#d4a373; --btn-text:#2b2220; }
+    :root[data-theme="terminal"]{ --bg:#000000; --surface:#111111; --text:#22c55e; --muted:#15803d; --border:#14532d; --brand:#22c55e; --btn-text:#000000; }
+    :root[data-theme="royal"]{ --bg:#172554; --surface:#1e3a8a; --text:#f0f9ff; --muted:#93c5fd; --border:#1e40af; --brand:#fbbf24; --btn-text:#1e3a8a; }
+    :root[data-theme="rose"]{ --bg:#fff1f2; --surface:#ffe4e6; --text:#881337; --muted:#be123c; --border:#fecdd3; --brand:#e11d48; --btn-text:#ffffff; }
+    /* Set 2 */
+    :root[data-theme="mint"]{ --bg:#f0fdf9; --surface:#ffffff; --text:#064e3b; --muted:#34d399; --border:#a7f3d0; --brand:#10b981; --btn-text:#ffffff; }
+    :root[data-theme="dracula"]{ --bg:#282a36; --surface:#44475a; --text:#f8f8f2; --muted:#6272a4; --border:#6272a4; --brand:#ff79c6; --btn-text:#282a36; }
+    :root[data-theme="gold"]{ --bg:#1c1917; --surface:#292524; --text:#fafaf9; --muted:#a8a29e; --border:#78716c; --brand:#d4af37; --btn-text:#1c1917; }
+    :root[data-theme="nord"]{ --bg:#eceff4; --surface:#e5e9f0; --text:#2e3440; --muted:#4c566a; --border:#d8dee9; --brand:#5e81ac; --btn-text:#ffffff; }
+    :root[data-theme="solarized"]{ --bg:#fdf6e3; --surface:#eee8d5; --text:#657b83; --muted:#93a1a1; --border:#ded6c3; --brand:#b58900; --btn-text:#ffffff; }
+    :root[data-theme="cherry"]{ --bg:#fff0f5; --surface:#ffe4e1; --text:#5c243a; --muted:#db7093; --border:#ffb6c1; --brand:#db7093; --btn-text:#ffffff; }
+    :root[data-theme="contrast"]{ --bg:#000000; --surface:#000000; --text:#ffffff; --muted:#ffff00; --border:#ffffff; --brand:#ffff00; --btn-text:#000000; --danger:#ff0000; }
+    /* Set 3 */
+    :root[data-theme="latte"]{ --bg:#fff8e1; --surface:#ffecb3; --text:#4e342e; --muted:#8d6e63; --border:#ffe082; --brand:#795548; --btn-text:#ffffff; }
+    :root[data-theme="cyberpunk"]{ --bg:#0b0c15; --surface:#161b22; --text:#00f3ff; --muted:#ff003c; --border:#2d2d44; --brand:#ff003c; --btn-text:#ffffff; }
+    :root[data-theme="paper"]{ --bg:#f3f2ea; --surface:#ffffff; --text:#353535; --muted:#757575; --border:#d1d1d1; --brand:#353535; --btn-text:#ffffff; }
+    :root[data-theme="navy"]{ --bg:#0a192f; --surface:#112240; --text:#e6f1ff; --muted:#8892b0; --border:#233554; --brand:#64ffda; --btn-text:#0a192f; }
+    :root[data-theme="olive"]{ --bg:#f4f7f0; --surface:#e2e8d8; --text:#3d4c39; --muted:#6c7a65; --border:#b5c4a9; --brand:#556b2f; --btn-text:#ffffff; }
+    :root[data-theme="amethyst"]{ --bg:#fdf4ff; --surface:#fae8ff; --text:#4a044e; --muted:#a21caf; --border:#f0abfc; --brand:#9333ea; --btn-text:#ffffff; }
+    :root[data-theme="sunset"]{ --bg:#fff5f2; --surface:#ffede9; --text:#4a1d1d; --muted:#9f1239; --border:#fecdd3; --brand:#ff5733; --btn-text:#ffffff; }
+    :root[data-theme="dimmed"]{ --bg:#1e1e1e; --surface:#252525; --text:#d4d4d4; --muted:#808080; --border:#3e3e3e; --brand:#007acc; --btn-text:#ffffff; }
+    :root[data-theme="teal"]{ --bg:#e0f2f1; --surface:#b2dfdb; --text:#004d40; --muted:#00796b; --border:#80cbc4; --brand:#009688; --btn-text:#ffffff; }
+    :root[data-theme="monochrome"]{ --bg:#ffffff; --surface:#f5f5f5; --text:#000000; --muted:#666666; --border:#cccccc; --brand:#333333; --btn-text:#ffffff; }
+
+    /* --- BASE STYLES --- */
+    html,body{ 
+        height:100%; margin:0; font-family: var(--app-font); 
+        background: var(--bg); color:var(--text); 
+        overflow:hidden; font-size: var(--base-size); 
+        transition: background 0.3s, color 0.3s;
+    }
+    *,*::before,*::after{ box-sizing:border-box; }
+    
+    /* --- LAYOUT --- */
+    .app-layout {
+      display: grid; grid-template-columns: 0px 1fr; grid-template-rows: var(--header-h) 1fr;
+      height: 100%; transition: grid-template-columns 0.3s ease;
+    }
+    .app-layout.sidebar-open { grid-template-columns: var(--sidebar-w) 1fr; }
+    @media (max-width: 768px) {
+      .app-layout.sidebar-open { grid-template-columns: 0px 1fr; } 
+      .sidebar { transform: translateX(-100%); position: fixed; top:var(--header-h); bottom:0; left:0; width:var(--sidebar-w); z-index:50; }
+      .app-layout.sidebar-open .sidebar { transform: translateX(0); box-shadow: 4px 0 12px rgba(0,0,0,0.2); }
+    }
+
+    /* --- COMPONENTS --- */
+    .header {
+      grid-column: 1 / -1; grid-row: 1; background: var(--surface); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 1rem; gap: 1rem; z-index: 40;
+    }
+    .menu-btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 0.4rem; border-radius: 6px; cursor: pointer; font-size: 1.1rem; line-height: 1; }
+    .header-title h1 { margin: 0; font-size: 1.1rem; color: var(--brand); }
+    .context-line { font-size: 0.85em; color: var(--muted); }
+
+    .sidebar {
+      grid-column: 1; grid-row: 2; background: var(--surface); border-right: 1px solid var(--border);
+      overflow-y: auto; display: flex; flex-direction: column; padding: 0.75rem; gap: 1rem;
+      visibility: hidden; opacity: 0; transition: all 0.3s;
+    }
+    .app-layout.sidebar-open .sidebar { visibility: visible; opacity: 1; }
+    
+    .sb-section { display: flex; flex-direction: column; gap: 0.35rem; }
+    .sb-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+    
+    input, select { width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1em; font-family: var(--app-font); }
+    ::placeholder { color: var(--muted); opacity: 0.7; }
+
+    /* BUTTONS */
+    .mi-grid-container, .br-container, .col-status-container { display: none; flex-direction: column; gap: 0.5rem; }
+    .mi-grid-container.show, .br-container.show, .col-status-container.show { display: flex; }
+    .mi-header { display: flex; justify-content: space-between; align-items: center; }
+    .btn-back-mi { font-size: 0.8em; padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); cursor: pointer; color: var(--muted); }
+    .mi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .mi-day-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px 2px; font-size: 0.8em; color: var(--text); cursor: pointer; text-align: center; }
+    .mi-day-btn.active { background: var(--brand); color: var(--btn-text); border-color: var(--brand); font-weight: bold; }
+    .br-buttons { display: flex; flex-direction: column; gap: 4px; }
+    .br-opt-btn { text-align: left; font-size: 0.9em; padding: 8px; border: 1px solid var(--border); background: var(--bg); border-radius: 4px; cursor: pointer; color: var(--text); }
+    .br-opt-btn.active { background: var(--brand); color: var(--btn-text); border-color: var(--brand); }
+
+    .sb-spacer { flex: 1; }
+    .btn-sidebar { width: 100%; text-align: left; background: transparent; border: 1px solid var(--border); padding: 0.6rem; border-radius: 6px; color: var(--text); cursor: pointer; font-size: 0.95em; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2px; font-family: var(--app-font); }
+    .btn-sidebar:hover { background: rgba(0,0,0,0.03); border-color: var(--brand); }
+    .btn-sidebar.active-mode { background: rgba(249, 115, 22, 0.1); border-color: var(--brand); color: var(--brand); }
+    .btn-settings { margin-top: auto; border-top: 1px solid var(--border); border-radius: 0; padding-top: 1rem; border: none; }
+    
+    .main-content { grid-column: 2; grid-row: 2; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    /* --- INPUTS --- */
+    .input-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .input-box { flex: 1 1 300px; display: flex; flex-direction: column; gap: 0.25rem; }
+    
+    textarea { width: 100%; height: 80px; resize: vertical; padding: 0.6rem; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 6px; font-size: 1em; font-family: var(--app-font); }
+    .br-mode-active textarea#bible-verse { height: 140px; }
+    .br-mode-active #note-box-container { display: none !important; }
+    
+    .btn-primary { background: var(--brand); color: var(--btn-text); border: none; padding: 0.7rem; border-radius: 50px; font-weight: 600; font-size: 1em; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; gap: 0.5rem; transition: transform 0.1s; font-family: var(--app-font); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary.update-mode { background: var(--success); }
+
+    /* --- TABLE STYLES --- */
+    .table-container { flex: 1; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); display: block; }
+    table { width: 100%; border-collapse: collapse; }
+    th { position: sticky; top: 0; background: var(--bg); padding: 0.75rem; text-align: left; font-size: 0.9em; border-bottom: 2px solid var(--border); color: var(--text); }
+    td { padding: 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 1em; color: var(--text); }
+    
+    .btn-icon { border:1px solid var(--border); background:transparent; border-radius:4px; cursor:pointer; padding:4px 8px; margin-left: 4px; font-size: 0.9em; color: var(--text); }
+    .btn-icon:hover { background: rgba(0,0,0,0.05); }
+    .btn-icon.delete { color: var(--danger); border-color: var(--danger); }
+
+    /* --- SONG LIST / ACCORDION STYLES --- */
+    .song-list-container { display: none; flex-direction: column; gap: 8px; }
+    .song-list-container.show { display: flex; }
+    
+    .az-filter { display: none; flex-wrap: wrap; gap: 4px; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+    .az-filter.show { display: flex; }
+    .az-btn { flex: 1; min-width: 24px; text-align: center; padding: 4px; font-size: 0.8em; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); cursor: pointer; color: var(--muted); }
+    .az-btn.active { background: var(--brand); color: var(--btn-text); border-color: var(--brand); font-weight: bold; }
+
+    .song-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .song-header { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--surface); transition: background 0.2s; }
+    .song-header:hover { background: var(--bg); }
+    .song-title { font-weight: 600; font-size: 1.05em; color: var(--brand); margin: 0; }
+    .song-meta { font-size: 0.8em; color: var(--muted); margin-top: 2px; }
+    .song-actions { display: flex; gap: 8px; }
+    .song-content { display: none; padding: 16px; border-top: 1px solid var(--border); background: var(--bg); font-family: 'Georgia', serif; line-height: 1.6; white-space: pre-wrap; color: var(--text); }
+    .song-card.expanded .song-content { display: block; }
+    .chevron { transition: transform 0.3s; font-size: 0.8em; color: var(--muted); }
+    .song-card.expanded .chevron { transform: rotate(180deg); }
+    
+    /* --- PLANNER / AGENDA STYLES --- */
+    .planner-view { display: none; flex-direction: column; gap: 15px; }
+    .planner-view.show { display: flex; }
+    
+    .event-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 10px; align-items: center; position: relative; }
+    
+    /* Ensuring functionality for past events but keeping visual distinction */
+    .event-card.past { opacity: 0.6; }
+    /* Ensure buttons inside past cards are always clickable and fully visible on hover */
+    .event-card.past:hover { opacity: 1; transition: opacity 0.2s; }
+    
+    .event-card.ongoing { border-left: 5px solid var(--success); }
+    
+    .event-date-box { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px; min-width: 55px; text-align: center; }
+    .event-day { font-size: 1.2em; font-weight: bold; color: var(--brand); line-height: 1; }
+    .event-month { font-size: 0.7em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    
+    .event-details { flex: 1; min-width: 0; }
+    .event-title { font-weight: 600; font-size: 1em; color: var(--text); margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-meta { font-size: 0.8em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .event-category-tag { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; border: 1px solid var(--border); }
+    
+    .countdown-badge { position: absolute; top: 10px; right: 10px; font-size: 0.75em; padding: 2px 6px; border-radius: 10px; background: var(--brand); color: white; font-weight: bold; }
+    .countdown-badge.urgent { background: var(--danger); }
+    .countdown-badge.ongoing { background: var(--success); }
+    .countdown-badge.past { background: var(--muted); }
+    
+    .quick-fill-row { display:flex; gap:5px; margin-bottom:5px; flex-wrap:wrap; }
+    .btn-quick { font-size:0.75em; padding:4px 8px; background:var(--bg); border:1px solid var(--border); border-radius:4px; cursor:pointer; color:var(--text); }
+    .btn-quick:hover { border-color:var(--brand); color:var(--brand); }
+
+    /* SEARCH STYLES */
+    .search-wrapper { position: relative; }
+    #search-input { padding-right: 35px; }
+    #clear-search-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-25%); color: var(--muted); font-weight: bold; cursor: pointer; display: none; z-index: 5; font-size: 16px; padding: 5px; }
+    #clear-search-btn:hover { color: var(--text); }
+    .suggestions-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: var(--shadow); display: none; margin-top: 4px; }
+    .suggestions-list.show { display: block; }
+    .suggestion-item { padding: 8px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.9em; color: var(--text); }
+    .suggestion-item:hover { background: var(--bg); }
+    .highlight { background-color: #fef08a; color: #854d0e; font-weight: bold; border-radius: 2px; }
+
+    /* MODALS */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+    .modal-box { background: var(--surface); padding: 1.5rem; border-radius: 12px; width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 1rem; border: 1px solid var(--border); position: relative; }
+    .modal-header { border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-weight: 700; font-size: 1.2rem; color: var(--brand); margin:0; }
+    .close-modal-x { background: transparent; border: none; font-size: 1.5rem; color: var(--muted); cursor: pointer; line-height: 1; padding: 0 5px; }
+    .close-modal-x:hover { color: var(--text); }
+
+    .setting-group { margin-bottom: 1rem; border: 1px solid var(--border); padding: 0.8rem; border-radius: 8px; background: var(--bg); }
+    .setting-label { font-size: 0.8em; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; display: block;}
+    .btn-modal { width: 100%; padding: 0.7rem; margin-bottom: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-weight: 500; font-size: 0.95em; font-family: var(--app-font); }
+    .btn-modal.primary { background: var(--brand); color: var(--btn-text); border: none; }
+    
+    .font-controls { display: flex; gap: 5px; }
+    .btn-font { flex: 1; padding: 5px; cursor: pointer; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 4px; }
+    .btn-font.active { background: var(--brand); color: var(--btn-text); border-color: var(--brand); }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95em; }
+    input[type="checkbox"] { width: auto; }
+    .auth-info { text-align: center; font-size: 0.9em; color: var(--muted); margin-bottom: 0.5rem; }
+    .version-tag { text-align: center; font-size: 0.7em; color: var(--muted); margin-top: 1rem; }
+
+    /* TOAST */
+    #toast {
+        visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 50px;
+        padding: 12px; position: fixed; z-index: 3000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+    }
+    #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+  </style>
+</head>
+<body>
+
+  <div id="toast">Notification Message</div>
+
+  <div id="export-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+         <div class="modal-title" style="text-align:center">Export</div>
+         <button class="close-modal-x" onclick="closeModals()">×</button>
+      </div>
+      <p style="text-align:center; font-size:0.9em; color:var(--muted)">Format & Range:</p>
+      <button class="btn-modal primary" onclick="runExport('doc-current')">📄 Word (Current)</button>
+      <button class="btn-modal primary" onclick="runExport('doc-all')">📚 Word (All)</button>
+      <div style="height:10px"></div>
+      <button class="btn-modal" style="border-color:#16a34a; color:#16a34a" onclick="runExport('xls-current')">📊 Excel (Current)</button>
+      <button class="btn-modal" style="border-color:#16a34a; color:#16a34a" onclick="runExport('xls-all')">📈 Excel (All)</button>
+    </div>
+  </div>
+
+  <div id="help-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+         <div class="modal-title" style="text-align:center">Help & Features</div>
+         <button class="close-modal-x" onclick="closeModals()">×</button>
+      </div>
+      <div style="font-size:0.9em; line-height:1.6; color:var(--text); max-height:60vh; overflow-y:auto; padding-right:5px">
+        <h4 style="margin:0 0 5px; color:var(--brand)">📅 Event Planner</h4>
+        <p style="margin:0 0 10px; color:var(--muted)">Track events with Start and End dates. Use <b>Quick Set</b> buttons to instantly fill dates for next PM, WS, or Thanksgiving.</p>
+
+        <h4 style="margin:0 0 5px; color:var(--brand)">📝 Taking Notes</h4>
+        <p style="margin:0 0 10px; color:var(--muted)">Select a date and gathering type. Type your Bible Verse and Note, then click <b>Add/Save</b>. Your work is <b>Auto-Saved</b> as you type!</p>
+
+        <h4 style="margin:0 0 5px; color:var(--brand)">📂 Collections</h4>
+        <p style="margin:0 0 10px; color:var(--muted)">Use the "Collections" menu for permanent items like <b>Praise Songs</b>, <b>Topic Reviews</b>, and <b>Trivia</b>.</p>
+
+        <h4 style="margin:0 0 5px; color:var(--brand)">💾 Export & Backup</h4>
+        <p style="margin:0 0 10px; color:var(--muted)">Click <b>Export Options</b> to download your notes. 
+        <br>• <b>Word:</b> Great for reading and printing.
+        <br>• <b>Excel:</b> Best for sorting and organizing data.</p>
+
+        <h4 style="margin:0 0 5px; color:var(--brand)">☁️ Cloud Sync</h4>
+        <p style="margin:0 0 10px; color:var(--muted)">Go to <b>Settings > Sign In</b> to sync your notes to the cloud. This keeps your data safe if you switch devices.</p>
+        
+        <div style="text-align:center; font-size:0.8em; color:var(--muted); margin-top:20px">
+            App Version 16.4
+        </div>
+      </div>
+      <button class="btn-modal" onclick="closeModals()" style="margin-top:10px">Got it!</button>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Settings</h2>
+        <button class="close-modal-x" onclick="closeModals()">×</button>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">Appearance</label>
+        
+        <label style="font-size:0.8em; margin-bottom:4px; display:block">Color Theme</label>
+        <select id="theme-select" style="margin-bottom:0.8rem">
+          <option value="system">System Default</option>
+          <option value="slate">Slate (Professional)</option>
+          <option value="sepia">Sepia (Reader)</option>
+          <option value="sunrise">Sunrise (Warm)</option>
+          <option value="ocean">Ocean (Blue)</option>
+          <option value="forest">Forest (Green)</option>
+          <option value="grape">Grape (Purple)</option>
+          <option value="sand">Sand (Yellow)</option>
+          <option value="night">Night (Dark)</option>
+          <option value="lavender">Lavender (Soft)</option>
+          <option value="espresso">Espresso (Coffee)</option>
+          <option value="terminal">Terminal (Hacker)</option>
+          <option value="royal">Royal (Deep Blue)</option>
+          <option value="rose">Rose (Soft Red)</option>
+          <option value="mint">Mint (Fresh)</option>
+          <option value="dracula">Dracula (Dark Code)</option>
+          <option value="gold">Gold (Luxury)</option>
+          <option value="nord">Nord (Cool Gray)</option>
+          <option value="solarized">Solarized (Soft)</option>
+          <option value="cherry">Cherry Blossom</option>
+          <option value="contrast">High Contrast</option>
+          <option value="latte">Latte (Beige/Coffee)</option>
+          <option value="cyberpunk">Cyberpunk (Neon)</option>
+          <option value="paper">Paper (Newsprint)</option>
+          <option value="navy">Navy (Dark Blue)</option>
+          <option value="olive">Olive (Earthy)</option>
+          <option value="amethyst">Amethyst (Jewel)</option>
+          <option value="sunset">Sunset (Warm)</option>
+          <option value="dimmed">Dimmed (Soft Dark)</option>
+          <option value="teal">Teal (Calming)</option>
+          <option value="monochrome">Monochrome</option>
+        </select>
+        
+        <label style="font-size:0.8em; margin-bottom:4px; display:block">Font Style</label>
+        <select id="font-select" style="margin-bottom:0.8rem">
+            <option value="'Inter', sans-serif">Inter (Modern Standard)</option>
+            <option value="'Tahoma', sans-serif">Tahoma (Classic)</option>
+            <option value="'Lora', serif">Lora (Bible Style)</option>
+            <option value="'Roboto', sans-serif">Roboto (Android)</option>
+            <option value="'Merriweather', serif">Merriweather (Reader)</option>
+            <option value="'Poppins', sans-serif">Poppins (Friendly)</option>
+            <option value="'Open Sans', sans-serif">Open Sans (Neutral)</option>
+            <option value="'Playfair Display', serif">Playfair (Elegant)</option>
+            <option value="'Nunito', sans-serif">Nunito (Rounded)</option>
+            <option value="'Bitter', serif">Bitter (Slab)</option>
+            <option value="'Montserrat', sans-serif">Montserrat (Geometric)</option>
+            <option value="'Crimson Text', serif">Crimson Text (Book)</option>
+            <option value="'Lato', sans-serif">Lato (Sleek)</option>
+            <option value="'EB Garamond', serif">EB Garamond (Traditional)</option>
+            <option value="'Ubuntu', sans-serif">Ubuntu (Modern)</option>
+            <option value="'Quicksand', sans-serif">Quicksand (Soft)</option>
+            <option value="'PT Serif', serif">PT Serif (Formal)</option>
+            <option value="'Dancing Script', cursive">Dancing Script (Cursive)</option>
+            <option value="'Oswald', sans-serif">Oswald (Condensed)</option>
+            <option value="'Space Mono', monospace">Space Mono (Tech)</option>
+        </select>
+
+        <label class="setting-label">Font Size</label>
+        <div class="font-controls">
+            <button class="btn-font" onclick="setFontSize('12px')">Small</button>
+            <button class="btn-font" onclick="setFontSize('14px')">Medium</button>
+            <button class="btn-font" onclick="setFontSize('16px')">Large</button>
+            <button class="btn-font" onclick="setFontSize('18px')">XL</button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">Data Management</label>
+        <div class="toggle-row" style="margin-bottom:0.8rem">
+            <span>⚠️ Confirm Deletion</span>
+            <input type="checkbox" id="confirm-delete-toggle" checked onchange="toggleConfirmDelete()">
+        </div>
+        <button class="btn-modal" onclick="forceSyncToCloud()">☁️ Force Cloud Sync</button>
+        <button class="btn-modal" onclick="exportData()">💾 Backup JSON</button>
+        <button class="btn-modal" onclick="importData()">📥 Restore JSON</button>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-label">Account</label>
+        <div id="settings-auth-status" class="auth-info">Not signed in</div>
+        <button id="settings-auth-btn" class="btn-modal primary">Sign In</button>
+      </div>
+
+      <button class="btn-modal" onclick="closeModals()" style="background:var(--bg)">Close</button>
+      <div class="version-tag">Study Notes v16.4</div>
+    </div>
+  </div>
+
+  <div class="app-layout sidebar-open" id="app-layout">
+    
+    <header class="header">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="header-title">
+        <h1>Brethren Study Notes</h1>
+        <div class="context-line" id="context-line">Loading...</div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sb-section">
+        <label class="sb-label">Gathering Details</label>
+        <input type="date" id="date" onchange="handleDateChange()">
+        
+        <div id="standard-gathering-container">
+            <select id="gathering-type" onchange="loadNotes()">
+            <option value="Prayer Meeting">Prayer Meeting</option>
+            <option value="Worship Service">Worship Service</option>
+            <option value="Thanksgiving">Thanksgiving</option>
+            <option value="International Thanksgiving Day 1">ITG Day 1</option>
+            <option value="International Thanksgiving Day 2">ITG Day 2</option>
+            <option value="International Thanksgiving Day 3">ITG Day 3</option>
+            <option value="Combined Prayer Meeting & Worship Service">Combined PM & WS</option>
+            </select>
+        </div>
+
+        <div id="mi-grid-container" class="mi-grid-container">
+            <div class="mi-header">
+                <span class="sb-label" style="color:var(--brand)">Mass Indoctrination</span>
+                <button class="btn-back-mi" onclick="resetMode()">Exit</button>
+            </div>
+            <div class="mi-grid" id="mi-buttons"></div>
+            <div style="font-size:0.7rem; color:var(--muted); text-align:center" id="mi-label">Permanent Study Notes</div>
+        </div>
+
+        <div id="br-container" class="br-container">
+            <div class="mi-header">
+                <span class="sb-label" style="color:var(--brand)">Bible Reading</span>
+                <button class="btn-back-mi" onclick="resetMode()">Exit</button>
+            </div>
+            <div class="br-buttons">
+                <button class="br-opt-btn active" onclick="setBRContext('Prayer Meeting', this)">Prayer Meeting</button>
+                <button class="br-opt-btn" onclick="setBRContext('Worship Service', this)">Worship Service</button>
+                <button class="br-opt-btn" onclick="setBRContext('Thanksgiving', this)">Thanksgiving</button>
+                <button class="br-opt-btn" onclick="setBRContext('Combined PM & WS', this)">Combined</button>
+            </div>
+            <div style="font-size:0.7em; color:var(--muted); margin-top:5px; line-height:1.4;">
+                <b style="color:var(--danger)">Note:</b> Bible Reading saves to the <u>Selected Date</u>. Please ensure a date is picked.
+            </div>
+        </div>
+
+        <div id="col-status-container" class="col-status-container">
+            <div class="mi-header">
+                <span id="col-mode-label" class="sb-label" style="color:var(--brand)">Collection</span>
+                <button class="btn-back-mi" onclick="resetMode()">Exit</button>
+            </div>
+            <div style="font-size:0.75em; color:var(--muted); margin-top:2px">
+                Permanent Collection
+            </div>
+        </div>
+
+      </div>
+
+      <div class="sb-section">
+        <label class="sb-label">Collections</label>
+        <button id="btn-col-song" class="btn-sidebar" onclick="enterCollectionMode('SONG')">🎵 Praise Songs</button>
+        <button id="btn-col-topic" class="btn-sidebar" onclick="enterCollectionMode('TOPIC')">🧠 Topic Review</button>
+        <button id="btn-col-trivia" class="btn-sidebar" onclick="enterCollectionMode('TRIVIA')">💡 Trivia</button>
+      </div>
+
+      <div class="sb-section search-wrapper">
+        <label class="sb-label">Search</label>
+        <div style="position:relative">
+            <input type="text" id="search-input" placeholder="Search verse or note..." autocomplete="off">
+            <span id="clear-search-btn" onclick="clearSearchUI()">&#10005;</span>
+        </div>
+        <div id="search-suggestions" class="suggestions-list"></div>
+      </div>
+
+      <div class="sb-section">
+        <label class="sb-label">Functions</label>
+        <button id="btn-mi-mode" class="btn-sidebar" onclick="enterMIMode()">📖 Mass Indoctrination</button>
+        <button id="btn-br-mode" class="btn-sidebar" onclick="enterBRMode()">📜 Bible Reading</button>
+        <button id="btn-planner-mode" class="btn-sidebar" onclick="enterPlannerMode()">📅 Event Planner</button>
+        <div style="height: 0.5rem;"></div>
+        <button class="btn-sidebar" onclick="openExportModal()">📝 Export Options...</button>
+        <button class="btn-sidebar" onclick="openHelpModal()">❓ Help / Guide</button>
+      </div>
+
+      <div class="sb-spacer"></div>
+
+      <button class="btn-sidebar btn-settings" onclick="openSettingsModal()">
+        ⚙️ Settings & Account
+      </button>
+
+    </aside>
+
+    <main class="main-content" id="main-content-area">
+      
+      <div id="alpha-filter" class="az-filter"></div>
+
+      <div class="input-group" id="main-inputs">
+        <div class="input-box">
+          <label class="sb-label" id="lbl-verse">Bible Verse</label>
+          <textarea id="bible-verse" placeholder="Paste single verse OR list of verses here..."></textarea>
+        </div>
+        <div class="input-box" id="note-box-container">
+          <label class="sb-label" id="lbl-note">Note</label>
+          <textarea id="note" placeholder="Enter your reflection..."></textarea>
+        </div>
+      </div>
+      
+      <div class="input-group" id="planner-inputs" style="display:none; margin-bottom:10px; align-items:flex-start">
+        <div class="input-box">
+            <label class="sb-label">Event Title</label>
+            <input type="text" id="planner-title" placeholder="e.g. Locale Cleaning" style="height:42px">
+            <div class="quick-fill-row" style="margin-top:4px">
+               <span style="font-size:0.75em; color:var(--muted); align-self:center">Quick Set:</span>
+               <button class="btn-quick" onclick="quickFillDate('PM')">Next PM</button>
+               <button class="btn-quick" onclick="quickFillDate('WS')">Next WS</button>
+               <button class="btn-quick" onclick="quickFillDate('TG')">Next TG</button>
+            </div>
+        </div>
+        <div class="input-box">
+            <label class="sb-label">Category</label>
+            <select id="planner-cat" style="height:42px">
+                <option value="Personal">Personal</option>
+                <option value="Church Duties">Church Duties</option>
+                <option value="Prayer Meeting">Prayer Meeting</option>
+                <option value="Worship Service">Worship Service</option>
+                <option value="Thanksgiving">Thanksgiving</option>
+                <option value="International Thanksgiving">International Thanksgiving</option>
+                <option value="Mass Indoctrination">Mass Indoctrination</option>
+                <option value="Serbisyong Kapatiran">Serbisyong Kapatiran</option>
+                <option value="Others">Others</option>
+            </select>
+        </div>
+        <div class="input-box">
+            <label class="sb-label">Start Date & Time</label>
+            <input type="datetime-local" id="planner-start" style="height:42px">
+            <label class="sb-label" style="margin-top:5px">End Date (Optional)</label>
+            <input type="datetime-local" id="planner-end" style="height:42px">
+        </div>
+      </div>
+
+      <button id="add-btn" class="btn-primary" onclick="addNote()">
+        <span>➕ Add / Save Note</span>
+      </button>
+      <button id="cancel-edit-btn" class="btn-modal" onclick="cancelEdit()" style="display:none; margin-top:5px; background:var(--bg)">Cancel Edit</button>
+
+      <div class="table-container" id="std-table-container">
+        <table id="notes-table">
+          <thead id="notes-head"></thead>
+          <tbody id="notes-body"></tbody>
+        </table>
+      </div>
+
+      <div class="song-list-container" id="song-list-view"></div>
+      
+      <div class="planner-view" id="planner-view"></div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { document.getElementById('app-layout').classList.toggle('sidebar-open'); }
+
+    // --- VARIABLES ---
+    const dateInput = document.getElementById('date');
+    const gatheringSelect = document.getElementById('gathering-type');
+    const notesHead = document.getElementById('notes-head');
+    const notesBody = document.getElementById('notes-body');
+    const verseInput = document.getElementById('bible-verse');
+    const noteInput = document.getElementById('note');
+    const contextEl = document.getElementById('context-line');
+    const mainContent = document.getElementById('main-content-area');
+    const addBtn = document.getElementById('add-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    
+    // Labels
+    const lblVerse = document.getElementById('lbl-verse');
+    const lblNote = document.getElementById('lbl-note');
+    
+    // Containers
+    const stdContainer = document.getElementById('standard-gathering-container');
+    const miContainer = document.getElementById('mi-grid-container');
+    const brContainer = document.getElementById('br-container');
+    const colContainer = document.getElementById('col-status-container'); 
+    const miButtonsContainer = document.getElementById('mi-buttons');
+    
+    // Views
+    const stdTableContainer = document.getElementById('std-table-container');
+    const songListContainer = document.getElementById('song-list-view');
+    const alphaFilter = document.getElementById('alpha-filter');
+    const plannerView = document.getElementById('planner-view');
+    
+    // Inputs Areas
+    const mainInputs = document.getElementById('main-inputs');
+    const plannerInputs = document.getElementById('planner-inputs');
+    const plannerTitle = document.getElementById('planner-title');
+    const plannerCat = document.getElementById('planner-cat');
+    const plannerStart = document.getElementById('planner-start');
+    const plannerEnd = document.getElementById('planner-end');
+
+    // Active Buttons
+    const btnMiMode = document.getElementById('btn-mi-mode');
+    const btnBrMode = document.getElementById('btn-br-mode');
+    const btnPlannerMode = document.getElementById('btn-planner-mode');
+    const btnColSong = document.getElementById('btn-col-song');
+    const btnColTopic = document.getElementById('btn-col-topic');
+    const btnColTrivia = document.getElementById('btn-col-trivia');
+    
+    const searchInp = document.getElementById('search-input');
+    const suggList = document.getElementById('search-suggestions');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+
+    let appMode = 'STD'; 
+    let selectedMIDay = 1;
+    let selectedBRContext = 'Prayer Meeting';
+    let currentKey = null, currentNotes = [], editingIndex = null;
+    let confirmDelete = true;
+    let activeCharFilter = 'ALL';
+    
+    // Planner Data
+    let plannerEvents = [];
+    let editingEventId = null;
+
+    // --- TOAST ---
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "show";
+        setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    // --- AUTO SAVE ---
+    function saveDraft() {
+        if(appMode === 'PLANNER') return;
+        localStorage.setItem('draft_verse', verseInput.value);
+        localStorage.setItem('draft_note', noteInput.value);
+    }
+    function loadDraft() {
+        const v = localStorage.getItem('draft_verse');
+        const n = localStorage.getItem('draft_note');
+        if(v) verseInput.value = v;
+        if(n) noteInput.value = n;
+    }
+    function clearDraft() {
+        localStorage.removeItem('draft_verse');
+        localStorage.removeItem('draft_note');
+    }
+    verseInput.addEventListener('input', saveDraft);
+    noteInput.addEventListener('input', saveDraft);
+
+    // --- HELPERS ---
+    function getSelectedDateISO() { return dateInput.value || ''; }
+    function escapeHtml(str){ return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+    function nl2brSafe(str){ return escapeHtml(str).replace(/\n/g,"<br>"); }
+
+    // --- MODALS ---
+    function openExportModal() { document.getElementById('export-modal').style.display = 'flex'; }
+    function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function openHelpModal() { document.getElementById('help-modal').style.display = 'flex'; }
+    function closeModals() { 
+        document.getElementById('export-modal').style.display = 'none'; 
+        document.getElementById('settings-modal').style.display = 'none'; 
+        document.getElementById('help-modal').style.display = 'none'; 
+    }
+    
+    // GLOBAL CLICK OUTSIDE TO CLOSE MODALS
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            closeModals();
+        }
+    }
+
+    // --- SETTINGS ---
+    function setFontSize(size) {
+        document.documentElement.style.setProperty('--base-size', size);
+        localStorage.setItem('mcgi_font_size', size);
+        document.querySelectorAll('.btn-font').forEach(b => {
+           b.classList.toggle('active', b.innerText.includes(size === '12px' ? 'Small' : size === '14px' ? 'Medium' : size === '16px' ? 'Large' : 'XL'));
+        });
+    }
+    function toggleConfirmDelete() {
+        confirmDelete = document.getElementById('confirm-delete-toggle').checked;
+        localStorage.setItem('mcgi_confirm_delete', confirmDelete);
+    }
+
+    // --- CORE LOGIC ---
+    window.resetMode = function() {
+        appMode = 'STD';
+        stdContainer.style.display = 'block';
+        miContainer.classList.remove('show');
+        brContainer.classList.remove('show');
+        colContainer.classList.remove('show'); 
+        mainContent.classList.remove('br-mode-active');
+        
+        // Reset View
+        stdTableContainer.style.display = 'block';
+        songListContainer.classList.remove('show');
+        plannerView.classList.remove('show');
+        alphaFilter.classList.remove('show');
+        
+        // Input switching
+        mainInputs.style.display = 'flex';
+        plannerInputs.style.display = 'none';
+        cancelEditBtn.style.display = 'none';
+
+        [btnMiMode, btnBrMode, btnColSong, btnColTopic, btnColTrivia, btnPlannerMode].forEach(b => b.classList.remove('active-mode'));
+        
+        lblVerse.textContent = "Bible Verse"; verseInput.placeholder = "Paste verse...";
+        lblNote.textContent = "Note"; noteInput.placeholder = "Enter your reflection...";
+        document.getElementById('note-box-container').style.display = 'flex';
+        
+        addBtn.innerHTML = `<span>➕ Add / Save Note</span>`;
+        addBtn.className = "btn-primary";
+        addBtn.onclick = addNote;
+        loadNotes();
+    };
+
+    window.enterMIMode = function() {
+        if(appMode === 'MI') return;
+        resetMode(); appMode = 'MI';
+        stdContainer.style.display = 'none';
+        miContainer.classList.add('show');
+        btnMiMode.classList.add('active-mode');
+        renderMIButtons(); loadNotes();
+    };
+
+    window.enterBRMode = function() {
+        if(appMode === 'BR') return;
+        resetMode(); appMode = 'BR';
+        stdContainer.style.display = 'none';
+        brContainer.classList.add('show');
+        btnBrMode.classList.add('active-mode');
+        mainContent.classList.add('br-mode-active');
+        addBtn.innerHTML = `<span>➕ Log Verses</span>`;
+        loadNotes();
+    };
+    
+    window.enterPlannerMode = function() {
+        if(appMode === 'PLANNER') return;
+        resetMode(); appMode = 'PLANNER';
+        stdContainer.style.display = 'none';
+        btnPlannerMode.classList.add('active-mode');
+        
+        // UI Swap
+        mainInputs.style.display = 'none';
+        plannerInputs.style.display = 'flex';
+        stdTableContainer.style.display = 'none';
+        plannerView.classList.add('show');
+        
+        addBtn.innerHTML = `<span>📅 Add Event</span>`;
+        addBtn.onclick = addEvent;
+        
+        contextEl.textContent = "Event Planner";
+        loadPlanner();
+    };
+
+    window.enterCollectionMode = function(mode) {
+        if(appMode === mode) return;
+        resetMode(); 
+        appMode = mode;
+        stdContainer.style.display = 'none'; 
+        colContainer.classList.add('show'); 
+        
+        const modeLabel = document.getElementById('col-mode-label');
+
+        if(mode === 'SONG') {
+            btnColSong.classList.add('active-mode');
+            modeLabel.textContent = "Praise Songs";
+            lblVerse.textContent = "Song Title"; verseInput.placeholder = "e.g., I Will Sing...";
+            lblNote.textContent = "Lyrics / Content"; noteInput.placeholder = "Paste lyrics here...";
+            
+            // Switch to Song View
+            stdTableContainer.style.display = 'none';
+            songListContainer.classList.add('show');
+            renderAlphaFilter();
+        } else if (mode === 'TRIVIA') {
+            btnColTrivia.classList.add('active-mode');
+            modeLabel.textContent = "Trivia";
+            lblVerse.textContent = "Trivia / Question"; verseInput.placeholder = "Did you know...?";
+            lblNote.textContent = "Answer / Details"; noteInput.placeholder = "Details...";
+        } else if (mode === 'TOPIC') {
+            btnColTopic.classList.add('active-mode');
+            modeLabel.textContent = "Topic Review";
+            lblVerse.textContent = "Topic / Reference"; verseInput.placeholder = "Topic Title...";
+            lblNote.textContent = "Explanation"; noteInput.placeholder = "Notes...";
+        }
+        loadNotes();
+    };
+
+    function renderMIButtons() {
+        miButtonsContainer.innerHTML = '';
+        for(let i=1; i<=14; i++) {
+            const btn = document.createElement('div');
+            btn.className = 'mi-day-btn';
+            btn.textContent = `Day ${i}`;
+            if(i === selectedMIDay) btn.classList.add('active');
+            btn.onclick = () => { selectedMIDay = i; renderMIButtons(); loadNotes(); };
+            miButtonsContainer.appendChild(btn);
+        }
+    }
+
+    window.setBRContext = function(ctx, el) {
+        selectedBRContext = ctx;
+        document.querySelectorAll('.br-opt-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        loadNotes();
+    };
+
+    function getCurrentGatheringType() {
+        if(appMode === 'MI') return `Mass Indoctrination Day ${selectedMIDay}`;
+        if(appMode === 'BR') return `Bible Reading (${selectedBRContext})`;
+        if(appMode === 'SONG') return "Praise Songs Collection";
+        if(appMode === 'TOPIC') return "Topic Review Collection";
+        if(appMode === 'TRIVIA') return "Trivia Collection";
+        if(appMode === 'PLANNER') return "Agenda";
+        return gatheringSelect.value;
+    }
+
+    function handleDateChange() { 
+        if(appMode === 'STD' || appMode === 'BR') loadNotes(); 
+    }
+
+    function findBucket(dateIso, gathering) {
+      if(appMode === 'SONG') return { key: `mcgi_notes2:COLLECTION:SONGS`, obj: JSON.parse(localStorage.getItem(`mcgi_notes2:COLLECTION:SONGS`)) || { date: 'PERMANENT', gatheringType: 'SONG', notes: [] } };
+      if(appMode === 'TOPIC') return { key: `mcgi_notes2:COLLECTION:TOPICS`, obj: JSON.parse(localStorage.getItem(`mcgi_notes2:COLLECTION:TOPICS`)) || { date: 'PERMANENT', gatheringType: 'TOPIC', notes: [] } };
+      if(appMode === 'TRIVIA') return { key: `mcgi_notes2:COLLECTION:TRIVIA`, obj: JSON.parse(localStorage.getItem(`mcgi_notes2:COLLECTION:TRIVIA`)) || { date: 'PERMANENT', gatheringType: 'TRIVIA', notes: [] } };
+      if(appMode === 'PLANNER') return { key: `mcgi_notes2:PLANNER:EVENTS`, obj: JSON.parse(localStorage.getItem(`mcgi_notes2:PLANNER:EVENTS`)) || { date: 'PERMANENT', gatheringType: 'PLANNER', notes: [] } };
+
+      if(appMode === 'MI') {
+          const key = `mcgi_notes2:INDOCTRINATION:DAY_${selectedMIDay}`;
+          const obj = JSON.parse(localStorage.getItem(key)) || { date: 'PERMANENT', gatheringType: gathering, notes: [] };
+          return { key, obj };
+      }
+
+      if(!dateIso) return { key: null, obj: null };
+      let foundKey = null, foundObj = null;
+      for(let i=0; i<localStorage.length; i++){
+        const key = localStorage.key(i);
+        if(!key.includes("INDOCTRINATION") && !key.includes("COLLECTION") && !key.includes("PLANNER")) { 
+            try { 
+                const obj = JSON.parse(localStorage.getItem(key));
+                if(obj && obj.date === dateIso && obj.gatheringType === gathering) {
+                    foundKey = key; foundObj = obj; break;
+                }
+            } catch(_){}
+        }
+      }
+      if(!foundKey) {
+        foundKey = 'mcgi_notes2:' + dateIso + ':' + gathering.replace(/[^\w]+/g, '_');
+        foundObj = { date: dateIso, gatheringType: gathering, notes: [] };
+      }
+      return { key: foundKey, obj: foundObj };
+    }
+
+    function renderTable() {
+      if(appMode === 'SONG') { renderSongList(); contextEl.textContent = "Praise Songs Collection"; return; }
+      if(appMode === 'PLANNER') { renderPlannerList(); return; }
+      
+      let col1 = "Verse"; let col2 = "Note";
+      if(appMode === 'TRIVIA') { col1 = "Trivia"; col2 = "Details"; }
+      if(appMode === 'TOPIC') { col1 = "Topic"; col2 = "Explanation"; }
+
+      if(appMode === 'BR') notesHead.innerHTML = `<tr><th style="width:90%">${col1}</th><th style="width:10%; text-align:right;">Action</th></tr>`;
+      else notesHead.innerHTML = `<tr><th style="width:40%">${col1}</th><th style="width:40%">${col2}</th><th style="width:20%; text-align:right;">Action</th></tr>`;
+
+      notesBody.innerHTML = '';
+      currentNotes.forEach((n, idx) => {
+        const tr = document.createElement('tr');
+        let noteHtml = nl2brSafe(n.note||'');
+        
+        let actionBtns = `
+            ${appMode === 'BR' ? '' : `<button class="btn-icon" onclick="editNote(${idx})" title="Edit">✏️</button>`}
+            <button class="btn-icon delete" onclick="deleteNote(${idx})" title="Delete">🗑️</button>
+        `;
+
+        tr.innerHTML = `<td>${nl2brSafe(n.bibleVerse||'')}</td>
+                        ${appMode === 'BR' ? '' : `<td>${noteHtml}</td>`}
+                        <td style="text-align:right; white-space:nowrap;">${actionBtns}</td>`;
+        notesBody.appendChild(tr);
+      });
+      
+      let typeLabel = getCurrentGatheringType();
+      if(appMode === 'STD' || appMode === 'BR') contextEl.textContent = `Date: ${dateInput.value || '--'} • ${typeLabel}`;
+      else contextEl.textContent = `${typeLabel}`;
+    }
+
+    // --- PLANNER LOGIC ---
+    window.loadPlanner = function() {
+        const bucket = findBucket(null, 'PLANNER');
+        currentKey = bucket.key;
+        plannerEvents = (bucket.obj && Array.isArray(bucket.obj.notes)) ? bucket.obj.notes : [];
+        renderPlannerList();
+    };
+
+    window.addEvent = function() {
+        const title = plannerTitle.value.trim();
+        const cat = plannerCat.value;
+        const start = plannerStart.value;
+        const end = plannerEnd.value;
+        
+        if(!title || !start) return showToast("Title and Start Date required!");
+        
+        // Update Mode
+        if(editingEventId) {
+             const idx = plannerEvents.findIndex(e => e.id === editingEventId);
+             if(idx > -1) {
+                 plannerEvents[idx] = { 
+                     ...plannerEvents[idx], 
+                     bibleVerse: title, 
+                     note: cat, 
+                     eventDate: start,
+                     endDate: end || start // Default to same day if empty
+                 };
+                 showToast("Event Updated! ✏️");
+                 cancelEdit();
+             }
+        } else {
+             // Add Mode
+             const newEvent = { 
+                id: Date.now(), 
+                bibleVerse: title, 
+                note: cat, 
+                eventDate: start,
+                endDate: end || start,
+                created: new Date().toISOString() 
+            };
+            plannerEvents.push(newEvent);
+            showToast("Event Added! 📅");
+            // Clear inputs
+            plannerTitle.value = ''; plannerStart.value = ''; plannerEnd.value = '';
+        }
+        
+        persistPlanner();
+        renderPlannerList();
+    };
+
+    window.editEvent = function(id) {
+        const ev = plannerEvents.find(e => e.id === id);
+        if(!ev) return;
+        
+        plannerTitle.value = ev.bibleVerse || '';
+        plannerCat.value = ev.note || 'Personal';
+        plannerStart.value = ev.eventDate || '';
+        plannerEnd.value = ev.endDate || ev.eventDate || '';
+        
+        editingEventId = id;
+        addBtn.innerHTML = "💾 Update Event";
+        addBtn.classList.add('update-mode');
+        cancelEditBtn.style.display = "inline-block";
+        window.scrollTo(0,0);
+        showToast("Editing Event...");
+    };
+
+    window.cancelEdit = function() {
+        editingEventId = null;
+        plannerTitle.value = ''; plannerStart.value = ''; plannerEnd.value = '';
+        addBtn.innerHTML = "📅 Add Event";
+        addBtn.classList.remove('update-mode');
+        cancelEditBtn.style.display = "none";
+    };
+    
+    window.deleteEvent = function(id) {
+        if(!confirm("Remove this event?")) return;
+        plannerEvents = plannerEvents.filter(e => e.id !== id);
+        if(editingEventId === id) cancelEdit();
+        persistPlanner();
+        renderPlannerList();
+    };
+
+    // Quick Fill Logic
+    window.quickFillDate = function(type) {
+        const now = new Date();
+        let target = new Date();
+        
+        if(type === 'PM') { // Wednesday (3) or Thursday (4)
+            // Logic: Find next Wednesday
+            target.setDate(now.getDate() + (3 + 7 - now.getDay()) % 7);
+            if(target <= now) target.setDate(target.getDate() + 7); // Ensure it's future
+            plannerTitle.value = "Prayer Meeting";
+            plannerCat.value = "Prayer Meeting";
+        } 
+        else if (type === 'WS' || type === 'TG') { // Saturday (6)
+             target.setDate(now.getDate() + (6 + 7 - now.getDay()) % 7);
+             if(target <= now) target.setDate(target.getDate() + 7);
+             plannerTitle.value = type === 'WS' ? "Worship Service" : "Thanksgiving";
+             plannerCat.value = type === 'WS' ? "Worship Service" : "Thanksgiving";
+        }
+        
+        // Format for datetime-local (YYYY-MM-DDTHH:MM)
+        const pad = (n) => n < 10 ? '0'+n : n;
+        const formatted = target.getFullYear() + "-" + pad(target.getMonth()+1) + "-" + pad(target.getDate()) + "T" + "19:00"; // Default 7pm
+        plannerStart.value = formatted;
+        plannerEnd.value = formatted;
+    };
+
+    function persistPlanner() {
+        if(!currentKey) currentKey = `mcgi_notes2:PLANNER:EVENTS`;
+        const payload = { date: 'PERMANENT', gatheringType: 'PLANNER', notes: plannerEvents };
+        localStorage.setItem(currentKey, JSON.stringify(payload));
+        if(window.pushToCloud) window.pushToCloud(currentKey, payload);
+    }
+    
+    function renderPlannerList() {
+        plannerView.innerHTML = '';
+        const now = new Date();
+        const sorted = [...plannerEvents].sort((a,b) => new Date(a.eventDate) - new Date(b.eventDate));
+        
+        if(sorted.length === 0) {
+            plannerView.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted)">No upcoming events.</div>`;
+            return;
+        }
+
+        sorted.forEach(ev => {
+            const startObj = new Date(ev.eventDate);
+            const endObj = new Date(ev.endDate || ev.eventDate);
+            
+            // Countdown Logic
+            const timeToStart = startObj - now;
+            const timeToEnd = endObj - now;
+            
+            let badgeText = "";
+            let badgeClass = "normal";
+            let isPast = false, isOngoing = false;
+
+            if (now >= startObj && now <= endObj) {
+                badgeText = "Ongoing";
+                badgeClass = "ongoing";
+                isOngoing = true;
+            } else if (timeToEnd < 0) {
+                badgeText = "Past";
+                badgeClass = "past";
+                isPast = true;
+            } else {
+                const diffDays = Math.ceil(timeToStart / (1000 * 60 * 60 * 24));
+                if(diffDays <= 1) { badgeText = "Tomorrow"; badgeClass = "urgent"; }
+                else if(diffDays === 0) { badgeText = "Today"; badgeClass = "urgent"; }
+                else if(diffDays < 7) { badgeText = `In ${diffDays} days`; }
+            }
+
+            // Date Formatting
+            const day = startObj.getDate();
+            const month = startObj.toLocaleString('default', { month: 'short' });
+            
+            // Format Time range
+            const timeStr = startObj.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            
+            // Check if multi-day
+            let dateDisplay = startObj.toDateString();
+            if(startObj.getDate() !== endObj.getDate()) {
+                dateDisplay += ` - ${endObj.toDateString().slice(4,10)}`; // Append " - Mon 16"
+            }
+
+            const card = document.createElement('div');
+            card.className = `event-card ${isPast ? 'past' : ''} ${isOngoing ? 'ongoing' : ''}`;
+            card.innerHTML = `
+                <div class="event-date-box">
+                    <span class="event-day">${day}</span>
+                    <span class="event-month">${month}</span>
+                </div>
+                <div class="event-details">
+                    <h3 class="event-title">${escapeHtml(ev.bibleVerse)}</h3>
+                    <div class="event-meta">
+                        <span class="event-category-tag">${escapeHtml(ev.note)}</span>
+                        <span>• ${timeStr}</span>
+                        <span>• ${dateDisplay}</span>
+                    </div>
+                </div>
+                ${badgeText ? `<div class="countdown-badge ${badgeClass}">${badgeText}</div>` : ''}
+                <div style="display:flex; flex-direction:column; gap:4px; margin-left:auto">
+                    <button class="btn-icon" onclick="editEvent(${ev.id})">✏️</button>
+                    <button class="btn-icon delete" onclick="deleteEvent(${ev.id})">🗑️</button>
+                </div>
+            `;
+            plannerView.appendChild(card);
+        });
+    }
+
+    // --- SONG LIST FEATURES ---
+    function renderAlphaFilter() {
+        alphaFilter.innerHTML = '';
+        alphaFilter.classList.add('show');
+        
+        const allBtn = document.createElement('div');
+        allBtn.className = `az-btn ${activeCharFilter === 'ALL' ? 'active' : ''}`;
+        allBtn.textContent = "ALL";
+        allBtn.onclick = () => { activeCharFilter = 'ALL'; renderSongList(); renderAlphaFilter(); };
+        alphaFilter.appendChild(allBtn);
+
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        alphabet.forEach(char => {
+            const btn = document.createElement('div');
+            btn.className = `az-btn ${activeCharFilter === char ? 'active' : ''}`;
+            btn.textContent = char;
+            btn.onclick = () => { activeCharFilter = char; renderSongList(); renderAlphaFilter(); };
+            alphaFilter.appendChild(btn);
+        });
+    }
+
+    function renderSongList() {
+        songListContainer.innerHTML = '';
+        const sortedNotes = currentNotes.map((n, i) => ({...n, originalIndex: i}))
+                                        .sort((a,b) => (a.bibleVerse||'').localeCompare(b.bibleVerse||''));
+
+        sortedNotes.forEach(n => {
+            const title = n.bibleVerse || "Untitled";
+            const firstChar = title.charAt(0).toUpperCase();
+
+            if(activeCharFilter !== 'ALL' && firstChar !== activeCharFilter) return;
+
+            const card = document.createElement('div');
+            card.className = 'song-card';
+            card.innerHTML = `
+                <div class="song-header" onclick="this.parentElement.classList.toggle('expanded')">
+                    <div>
+                        <h3 class="song-title">${escapeHtml(title)}</h3>
+                    </div>
+                    <span class="chevron">▼</span>
+                </div>
+                <div class="song-content">${nl2brSafe(n.note || 'No lyrics...')}</div>
+                <div style="padding:8px; border-top:1px solid var(--border); background:var(--bg); display:flex; justify-content:flex-end;">
+                     <button class="btn-icon" onclick="editNote(${n.originalIndex})">✏️ Edit</button>
+                     <button class="btn-icon delete" onclick="deleteNote(${n.originalIndex})">🗑️ Delete</button>
+                </div>
+            `;
+            songListContainer.appendChild(card);
+        });
+        
+        if(songListContainer.children.length === 0) {
+            songListContainer.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted)">No songs found for filter "${activeCharFilter}"</div>`;
+        }
+    }
+
+    function persist() {
+      if(!currentKey) return;
+      const gType = getCurrentGatheringType();
+      const dIso = (appMode === 'STD' || appMode === 'BR') ? getSelectedDateISO() : 'PERMANENT';
+      const payload = { date: dIso, gatheringType: gType, notes: currentNotes };
+      localStorage.setItem(currentKey, JSON.stringify(payload));
+      if(window.pushToCloud) window.pushToCloud(currentKey, payload);
+    }
+
+    window.loadNotes = function() {
+      const d = getSelectedDateISO();
+      const g = getCurrentGatheringType();
+      editingIndex = null; currentNotes = []; currentKey = null;
+      if(appMode === 'STD' && !d) { renderTable(); return; }
+      if(appMode === 'PLANNER') { loadPlanner(); return; }
+      
+      const bucket = findBucket(d, g);
+      currentKey = bucket.key;
+      currentNotes = (bucket.obj && Array.isArray(bucket.obj.notes)) ? bucket.obj.notes : [];
+      renderTable();
+    };
+
+    window.addNote = function() {
+      // Safety for Planner mode reusing button
+      if(appMode === 'PLANNER') { addEvent(); return; }
+
+      const vVal = (verseInput.value||'').trim();
+      const nVal = (noteInput.value||'').trim();
+      const dIso = getSelectedDateISO();
+      
+      if((appMode === 'STD' || appMode === 'BR') && !dIso) return showToast('Please pick a date.');
+      if(!vVal && !nVal) return showToast('Enter content first.');
+      if(appMode === 'BR' && !/\d/.test(vVal)) {
+           if(!confirm("This doesn't look like a Bible verse (no numbers). Save anyway?")) return;
+      }
+
+      const gType = getCurrentGatheringType();
+      if(!currentKey) {
+         const b = findBucket(dIso, gType);
+         currentKey = b.key; currentNotes = (b.obj.notes || []);
+      }
+      
+      const newNoteBase = { bibleVerse: vVal, note: appMode === 'BR' ? '' : nVal, date: dIso, gatheringType: gType, createdDate: new Date().toISOString() };
+
+      if(editingIndex != null) {
+          currentNotes[editingIndex] = { ...currentNotes[editingIndex], bibleVerse: vVal, note: nVal };
+          editingIndex = null;
+          showToast("Updated! ✅");
+      } else {
+          const lines = vVal.split('\n');
+          if(lines.length > 1 && appMode === 'STD') { 
+             let group = "", groups = [];
+             lines.forEach(line => {
+                const t = line.trim();
+                if(!t) return;
+                const isHeader = /[\dA-Z].+\d+:\d+|[\dA-Z].+\(.*\)/.test(t) && !/^\d+\./.test(t);
+                if(isHeader && group !== "") { groups.push(group); group = t; }
+                else { group = (group === "" ? t : group + "\n" + t); }
+             });
+             if(group!=="") groups.push(group);
+             groups.forEach(g => currentNotes.push({ ...newNoteBase, bibleVerse: g }));
+          } else {
+             currentNotes.push(newNoteBase);
+          }
+          showToast("Saved! ✅");
+      }
+      persist();
+      verseInput.value = ''; noteInput.value = ''; 
+      if(appMode !== 'SONG') verseInput.focus();
+      clearDraft();
+      renderTable();
+    };
+
+    window.editNote = function(i) {
+      if(i<0 || i>=currentNotes.length) return;
+      const n = currentNotes[i];
+      verseInput.value = n.bibleVerse||'';
+      noteInput.value = n.note||'';
+      editingIndex = i; verseInput.focus();
+      showToast("Editing...");
+      window.scrollTo(0,0);
+    };
+
+    window.deleteNote = function(i) {
+      if(confirmDelete && !confirm('Delete note?')) return;
+      currentNotes.splice(i,1); persist(); renderTable();
+      showToast("Deleted 🗑️");
+    };
+    
+    window.clearSearchUI = function() {
+        searchInp.value = '';
+        suggList.innerHTML = '';
+        suggList.classList.remove('show');
+        clearSearchBtn.style.display = 'none';
+    };
+
+    window.addEventListener('load', () => {
+       if(!dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+       renderMIButtons(); window.loadNotes();
+       loadDraft();
+
+       const ts = document.getElementById('theme-select');
+       ts.addEventListener('change', () => {
+          document.documentElement.dataset.theme = ts.value;
+          localStorage.setItem('mcgi_theme', ts.value);
+       });
+       const savedT = localStorage.getItem('mcgi_theme');
+       if(savedT) { ts.value = savedT; document.documentElement.dataset.theme = savedT; }
+
+       const fs = document.getElementById('font-select');
+       fs.addEventListener('change', () => {
+          document.documentElement.style.setProperty('--app-font', fs.value);
+          localStorage.setItem('mcgi_font_family', fs.value);
+       });
+       const savedFont = localStorage.getItem('mcgi_font_family');
+       if(savedFont) { fs.value = savedFont; document.documentElement.style.setProperty('--app-font', savedFont); }
+       
+       const savedF = localStorage.getItem('mcgi_font_size');
+       if(savedF) setFontSize(savedF);
+       
+       const savedCD = localStorage.getItem('mcgi_confirm_delete');
+       if(savedCD !== null) { 
+           confirmDelete = (savedCD === 'true');
+           document.getElementById('confirm-delete-toggle').checked = confirmDelete;
+       }
+
+       searchInp.addEventListener('input', () => {
+          const q = searchInp.value.toLowerCase().trim();
+          clearSearchBtn.style.display = q.length > 0 ? 'block' : 'none';
+          suggList.innerHTML = ''; suggList.classList.remove('show');
+          if(!q) return;
+
+          const terms = q.split(" ").filter(t => t.length > 0);
+          let matches = [];
+          for(let i=0; i<localStorage.length; i++){
+             try {
+                const d = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                if(d && Array.isArray(d.notes)) {
+                   d.notes.forEach(n => {
+                      const fullText = ((n.bibleVerse||'') + " " + (n.note||'')).toLowerCase();
+                      if(terms.every(term => fullText.includes(term))) matches.push(n);
+                   });
+                }
+             } catch(_){}
+          }
+          if(matches.length > 0) {
+             suggList.classList.add('show');
+             matches.slice(0,10).forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                let displayVerse = escapeHtml(m.bibleVerse);
+                let displayNote = escapeHtml(m.note).substring(0, 50); 
+                const regex = new RegExp(`(${terms.join('|')})`, 'gi');
+                displayVerse = displayVerse.replace(regex, '<span class="highlight">$1</span>');
+                displayNote = displayNote.replace(regex, '<span class="highlight">$1</span>');
+                div.innerHTML = `<div>${displayVerse}</div><div style="font-size:0.85em; color:var(--muted)">${displayNote}...</div>`;
+                div.onclick = () => { verseInput.value = m.bibleVerse; noteInput.value = m.note; clearSearchUI(); };
+                suggList.appendChild(div);
+             });
+          }
+       });
+       
+       document.addEventListener('click', function(e) {
+            if (!searchInp.contains(e.target) && !suggList.contains(e.target) && e.target !== clearSearchBtn) {
+                suggList.classList.remove('show');
+            }
+       });
+    });
+
+    // --- EXPORT/IMPORT & FIREBASE ---
+    window.exportData = function() {
+       const out = { version:3, notes:{} };
+       for(let i=0; i<localStorage.length; i++){
+          const k = localStorage.key(i);
+          if(k.startsWith('mcgi_notes')) try{ out.notes[k]=JSON.parse(localStorage.getItem(k)); }catch(_){}
+       }
+       download('backup.json', JSON.stringify(out,null,2), 'application/json');
+    };
+    window.importData = function() {
+       const inp = document.createElement('input'); inp.type='file'; inp.accept='.json';
+       inp.onchange = e => {
+          const r = new FileReader();
+          r.onload = () => {
+             try {
+                const d = JSON.parse(r.result);
+                if(d.notes) { Object.entries(d.notes).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v))); showToast("Imported! 📥"); location.reload(); }
+             } catch(e){ showToast("Error Importing"); }
+          };
+          r.readAsText(e.target.files[0]);
+       };
+       inp.click();
+    };
+    
+    window.runExport = function(mode) {
+       closeModals();
+       let dataToExport = [];
+       if(mode.includes('current')) {
+           if(!currentNotes || currentNotes.length === 0) return showToast("No notes to export.");
+           const dVal = (appMode === 'STD') ? dateInput.value : "Permanent Collection";
+           const gType = getCurrentGatheringType();
+           dataToExport.push({ date: dVal, gatheringType: gType, notes: currentNotes });
+       } else {
+           for(let i=0; i<localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if(k.startsWith('mcgi_notes')) try{ dataToExport.push(JSON.parse(localStorage.getItem(k))); }catch(_){}
+           }
+           if(dataToExport.length === 0) return showToast("No notes found.");
+           dataToExport.sort((a,b) => new Date(b.date)-new Date(a.date));
+       }
+
+       if(mode.startsWith('doc')) {
+           let html = buildHtmlDoc(mode.includes('all') ? "All Study Notes" : "Study Notes", dataToExport);
+           download(`Notes_${new Date().toISOString().slice(0,10)}.doc`, html, 'application/msword');
+       } else {
+           if(typeof XLSX === 'undefined') return showToast("Excel library loading...");
+           let wb = XLSX.utils.book_new();
+           let wsData = [["Date", "Gathering/Type", "Verse/Title", "Note/Content"]];
+           dataToExport.forEach(group => {
+               group.notes.forEach(note => {
+                   wsData.push([group.date, group.gatheringType, note.bibleVerse, note.note]);
+               });
+           });
+           let ws = XLSX.utils.aoa_to_sheet(wsData);
+           ws['!cols'] = [{wch:15}, {wch:30}, {wch:40}, {wch:60}];
+           XLSX.utils.book_append_sheet(wb, ws, "Notes");
+           XLSX.writeFile(wb, `Notes_${new Date().toISOString().slice(0,10)}.xlsx`);
+       }
+    };
+
+    function buildHtmlDoc(title, dataGroups) {
+       let content = `<h1 style="text-align:center; color:#f97316; font-family:Arial">${title}</h1>`;
+       dataGroups.forEach(g => {
+          content += `<div style="margin-bottom:20px; font-family:Arial"><h3 style="background:#eee; padding:5px; border-left:5px solid #f97316">${g.gatheringType} <span style="font-size:0.8em; color:#666">(${g.date})</span></h3><table border="1" style="width:100%; border-collapse:collapse"><tr><th style="width:30%">Verse</th><th>Note</th></tr>`;
+          (g.notes||[]).forEach(n => { content += `<tr><td style="vertical-align:top"><b>${(n.bibleVerse||'').replace(/\n/g,'<br>')}</b></td><td style="vertical-align:top">${(n.note||'').replace(/\n/g,'<br>')}${n.createdDate ? `<br><br><span style="color:#888; font-size:0.8em">Recorded: ${n.createdDate}</span>` : ''}</td></tr>`; });
+          content += `</table></div>`;
+       });
+       return `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body>${content}</body></html>`;
+    }
+    function download(name, content, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff', content], {type})); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+
+    (function(){
+      const cfg = { apiKey: "AIzaSyDSLuuGbLmRV0jMo7Rd5fcH-Sd7JCDWZus", authDomain: "mcgi-notes-and-viewer.firebaseapp.com", projectId: "mcgi-notes-and-viewer", storageBucket: "mcgi-notes-and-viewer.firebasestorage.app", messagingSenderId: "110352584961", appId: "1:110352584961:web:34c657ddf94c0abb0f0b00" };
+      try {
+         firebase.initializeApp(cfg); const auth = firebase.auth(); const db = firebase.firestore();
+         const btn = document.getElementById('settings-auth-btn'); 
+         const stat = document.getElementById('settings-auth-status'); 
+         let user = null, unsubscribe = null;
+         
+         const originalSetItem = localStorage.setItem.bind(localStorage);
+         btn.onclick = () => user ? auth.signOut() : auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+
+         window.forceSyncToCloud = async function() {
+            if(!user) return showToast("Please Sign In first!");
+            if(!confirm("Re-upload ALL local notes to cloud?")) return;
+            try {
+                let count = 0;
+                for(let i=0; i<localStorage.length; i++) {
+                   const k = localStorage.key(i);
+                   if(k.startsWith('mcgi_notes')) {
+                       const v = JSON.parse(localStorage.getItem(k));
+                       await db.collection('mcgi_notes_v2').doc(user.uid+'_'+k.replace(/[:\.]/g,'_')).set({
+                          uid:user.uid, key:k, date:v.date, gatheringType:v.gatheringType, notes:v.notes, updatedAt: new Date()
+                       }, {merge:true});
+                       count++;
+                   }
+                }
+                showToast(`Synced ${count} notes! ☁️`);
+            } catch(e) { showToast("Error: " + e.message); }
+         };
+
+         window.pushToCloud = function(key, dataObj) {
+            if(!user) return; 
+            db.collection('mcgi_notes_v2').doc(user.uid+'_'+key.replace(/[:\.]/g,'_')).set({
+                uid:user.uid, key:key, date:dataObj.date, gatheringType:dataObj.gatheringType, notes:dataObj.notes, updatedAt: new Date()
+            }, {merge:true}).catch(console.error);
+         };
+
+         auth.onAuthStateChanged(u => {
+            if(unsubscribe) { unsubscribe(); unsubscribe = null; }
+            user = u;
+            if(u) {
+               stat.textContent = `User: ${u.email}`; btn.textContent = "Sign Out";
+               let debounceTimer = null;
+               unsubscribe = db.collection('mcgi_notes_v2').where('uid','==',u.uid).onSnapshot(snap => {
+                   snap.docChanges().forEach(c => {
+                      if(c.type==='added' || c.type==='modified') {
+                         const v = c.doc.data();
+                         if(v.key && v.notes) originalSetItem(v.key, JSON.stringify({date:v.date, gatheringType:v.gatheringType, notes:v.notes}));
+                      }
+                   });
+                   clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { if(window.loadNotes) window.loadNotes(); }, 500);
+                 });
+            } else { stat.textContent = "Not signed in"; btn.textContent = "Sign in with Google"; }
+         });
+      } catch(e){ console.error(e); }
+    })();
+  </script>
+</body>
+</html>
